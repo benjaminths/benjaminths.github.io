@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Génère les pages du site dans les six langues du jeu. python3 build.py, puis git push : GitHub Pages sert le résultat.
-privacy.html / support.html / index.html sont la version française ; les autres langues ont un suffixe (-en, -es, -de, -it, -nl)."""
+privacy.html / support.html / index.html sont la version française ; les autres langues ont un suffixe (-en, -es, -de, -it, -nl).
+Les pages sont écrites dans le sous-dossier SITE_DIR, pas à la racine du dépôt : voir le commentaire de SITE_DIR."""
 import html
 from pathlib import Path
 
@@ -8,6 +9,13 @@ LANGS = ["fr", "en", "es", "de", "it", "nl"]
 DATE = "2026-09-12"
 MAIL = "ben@enami.fr"
 BASE = "https://benjaminths.github.io/padel-idle-site/"
+
+# Ce dépôt est le site racine du développeur (nommé <pseudo>.github.io), donc GitHub Pages
+# sert sa racine sur https://benjaminths.github.io/. La racine est réservée à app-ads.txt,
+# qu'AdMob ne lit qu'à cet endroit, et à la page d'accueil Enami. Les pages du jeu vivent
+# donc dans ce sous-dossier, dont le nom reproduit l'ancienne URL du site pour que les
+# liens déjà publiés (App Store, moteurs de recherche) continuent de répondre : BASE.
+SITE_DIR = "padel-idle-site"
 
 
 def page_name(kind, lang):
@@ -350,9 +358,10 @@ def support(lang):
 
 
 if __name__ == "__main__":
-    here = Path(__file__).parent
+    out = Path(__file__).parent / SITE_DIR
+    out.mkdir(exist_ok=True)
     for lang in LANGS:
-        (here / page_name("index", lang)).write_text(index(lang), encoding="utf-8")
-        (here / page_name("privacy", lang)).write_text(privacy(lang), encoding="utf-8")
-        (here / page_name("support", lang)).write_text(support(lang), encoding="utf-8")
-    print(f"{3 * len(LANGS)} pages générées.")
+        (out / page_name("index", lang)).write_text(index(lang), encoding="utf-8")
+        (out / page_name("privacy", lang)).write_text(privacy(lang), encoding="utf-8")
+        (out / page_name("support", lang)).write_text(support(lang), encoding="utf-8")
+    print(f"{3 * len(LANGS)} pages générées dans {SITE_DIR}/.")
